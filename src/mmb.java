@@ -5,43 +5,62 @@ import java.io.*;
  * Created by Kevin on 6/26/2017.
  */
 public class mmb {
+    //5 constants as defined by algo specs
+    public static final int C = 0x2AAAAAAA;
+    public static final int c0 = 0x025F1CDB;
+    public static final int c1 = 0x04BE39B6;
+    public static final int c2 = 0x12F8E6D8;
+    public static final int c3 = 0x2F8E6D81;
+
+
+
     public static void main(String[] args){
-        int key[] = new int[args[0].length()/2];
-        int[] k0 = new int[key.length/4], k1 = new int[key.length/4], k2 = new int[key.length/4], k3 = new int[key.length/4];
+        //int key[] = new int[args[0].length()];
+        String key = args[0];
+        int k0 = 0, k1 = 0, k2 = 0, k3 = 0;
 
 
         //read in key from cmdline argument
         int keypointer=0;
-        for(int i = 0; i < args[0].length(); i++){
-            if(i%2 != 0) {
-                String substring = args[0].substring(i-1, i+1);
-                //System.out.println("Substring:" + substring);
-                key[keypointer] = Integer.parseInt(substring, 16);
-                //System.out.println("After int conv: " + key[keypointer]);
-                keypointer ++;
+
+        System.out.println(key.length());
+        for(int i = 0; i <= key.length(); i++){
+
+            if(i%8==0 && i!=0) {
+                String substring = args[0].substring(i-8, i);
+                System.out.println("Substring:" + substring);
+                if(i == 8){
+                    k0 = Integer.parseInt(substring, 16);
+                }
+                else if(i == 16){
+                    k1 = Integer.parseInt(substring, 16);
+                } else if(i == 24){
+                    k2 = Integer.parseInt(substring, 16);
+                } else if(i == 32){
+                    k3 = Integer.parseInt(substring, 16);
+                }
+
             }
+
+
         }
-        //split key into subarrays
-        int k0ptr = 0, k1ptr = 0, k2ptr = 0, k3ptr = 0;
-        for(int k = 0; k < key.length; k++){
-            if(k < 4){
-                k0[k0ptr] = key[k];
-                k0ptr ++;
-            }else if(k < 8){
-                k1[k1ptr] = key[k];
-                k1ptr ++;
-            }else if(k < 12){
-                k2[k2ptr] = key[k];
-                k2ptr ++;
-            }else{
-                k3[k3ptr] = key[k];
-                k3ptr ++;
-            }
-        }
-        printKeyArrays(k0,k1, k2, k3);
+        System.out.println("k0: " + k0);
+        System.out.println("k1: " + k1);
+        System.out.println("k2: " + k2);
+        System.out.println("k3: " + k3);
+
+        System.out.println("---------");
+
+        System.out.println("k0: " + Integer.toHexString(k0));
+        System.out.println("k1: " + Integer.toHexString(k1));
+        System.out.println("k2: " + Integer.toHexString(k2));
+        System.out.println("k3: " + Integer.toHexString(k3));
+
+
 
         char message[] = new char[16];
-        char[] x0 = new char[4], x1 = new char[4], x2 = new char[4], x3 = new char[4];
+        int int_val_message[] = new int[16];
+        int x0 = 0, x1 = 0, x2 = 0, x3 = 0;
 
         //initialize message array to empty chars so we don't have to backfill later if
         //given input of length < 16
@@ -69,20 +88,13 @@ public class mmb {
             e.printStackTrace();
         }
         //split message into subarrays
-        int x0ptr = 0, x1ptr = 0, x2ptr = 0, x3ptr = 0;
+
         for(int k = 0; k < message.length; k++){
-            if(k < 4){
-                x0[x0ptr] = message[k];
-                x0ptr ++;
-            }else if(k < 8){
-                x1[x1ptr] = message[k];
-                x1ptr ++;
-            }else if(k < 12){
-                x2[x2ptr] = message[k];
-                x2ptr ++;
-            }else{
-                x3[x3ptr] = message[k];
-                x3ptr ++;
+            int_val_message[k] = (int)message[k];
+            if(k % 4 == 0 && k != 0) {
+                String substring = message.toString().substring(k-4, k);
+
+
             }
         }
 
@@ -93,23 +105,16 @@ public class mmb {
     public static int xOr(int a, int b){
         return a^b;
     }
-
-    public static void printKeyArrays(int[]k0, int[]k1, int[]k2, int[]k3){
-        for(int i : k0){
-            System.out.println(i);
-        }
-        System.out.println("--------");
-        for(int i : k1){
-            System.out.println(i);
-        }
-        System.out.println("--------");
-        for(int i : k2){
-            System.out.println(i);
-        }
-        System.out.println("--------");
-        for(int i : k3){
-            System.out.println(i);
-        }
+    public static int multMod(int a, int b, int m){
+        return (a*b)%m;
     }
+    public static char[][] mmbFunc(char[][] message){
+        for(char[] charArray : message){
+
+        }
+        return message;
+    }
+
+
 
 }
