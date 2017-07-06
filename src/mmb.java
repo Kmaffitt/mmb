@@ -1,16 +1,13 @@
-
-import sun.nio.cs.US_ASCII;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 /**
  * Created by Kevin on 6/26/2017.
  */
 public class mmb {
     //5 constants as defined by algo specs
+    //using BigInteger because unsigned int not available until java8
     public static final BigInteger C = new BigInteger("2AAAAAAA", 16);
     public static final BigInteger c0 = new BigInteger("025F1CDB", 16);
     public static final BigInteger c1 = new BigInteger("04BE39B6", 16);
@@ -21,12 +18,11 @@ public class mmb {
 
 
     public static void main(String[] args){
-        //int key[] = new int[args[0].length()];
+        //read in key from cmdline argument
         String key = args[0];
         BigInteger k0 = new BigInteger("0", 16), k1 = new BigInteger("0", 16), k2 = new BigInteger("0", 16), k3 = new BigInteger("0", 16);
 
-        //read in key from cmdline argument
-
+        //split key string into substring, parse into BigInts
         for(int i = 0; i <= key.length(); i++){
 
             if(i%8==0 && i!=0) {
@@ -34,7 +30,7 @@ public class mmb {
                 //byte[] stringBytes = flipBytes(substring.getBytes());
                 //String newsubString = new String(stringBytes);
 
-                System.out.println("Substring:" + substring);
+                //System.out.println("Substring:" + substring);
                 if(i == 8){
                     k0 = new BigInteger(substring, 16);
                 }
@@ -48,12 +44,9 @@ public class mmb {
 
             }
 
-
         }
+        //put keys into array for easier access
         BigInteger[] keyArray = {k0, k1, k2, k3};
-        for(BigInteger k: keyArray){
-
-        }
 
 
 //        System.out.println("k0: " + k0);
@@ -69,7 +62,6 @@ public class mmb {
 //        System.out.println("k3: " + k3.toString(16));
 
 
-
         char message[] = new char[16];
 
         //initialize message array to empty chars so we don't have to backfill later if
@@ -77,28 +69,28 @@ public class mmb {
         for(int j = 0;j < message.length; j++){
             message[j] = '\0';
         }
+        
         //read in message from StdIn TODO: switch back to input stream reader before submission
-        //InputStreamReader reader = new InputStreamReader(System.in);
-
-
         int i;
         int msgPointer = 0;
         try {
-            FileInputStream fis = new FileInputStream("C:\\Users\\Kevin\\Desktop\\input.txt");
-            //while ((i = reader.read()) != -1) {
-                //message[msgPointer] = (char) i;
-                //msgPointer ++;
-            //}
-
-            while ((i = fis.read()) != -1) {
-                //System.out.println("i is :" + i);
+            //FileInputStream fis = new FileInputStream("C:\\Users\\Kevin\\Desktop\\input.txt");
+            InputStreamReader reader = new InputStreamReader(System.in);
+            while ((i = reader.read()) != -1) {
                 message[msgPointer] = (char) i;
                 msgPointer ++;
             }
+
+//            while ((i = fis.read()) != -1) {
+//                System.out.println("i is :" + i);
+//                message[msgPointer] = (char) i;
+//                msgPointer ++;
+//            }
         }catch(Exception e){
             e.printStackTrace();
         }
         //split message into subarrays
+        //char toString giving buggy output for some reason
         String s = "";
         for(char c : message){
             s += String.valueOf(c);
@@ -106,17 +98,57 @@ public class mmb {
 
         BigInteger[] messageArrays = string2BigInts(s);
 
+        //printArrays(messageArrays);
 
-        printArrays(messageArrays);
         //do encryption
-        for(int j = 0; j < 4; j++){
-            messageArrays[j] = messageArrays[j].xor(keyArray[j]);
-        }
-        printArrays(messageArrays);
+        //STEP 1
+        messageArrays[0] = messageArrays[0].xor(keyArray[0]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[1]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[2]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[3]);
+        //printArrays(messageArrays);
+        //STEP 2
         mmbFunc(messageArrays);
 
-        printArrays(messageArrays);
+        //printArrays(messageArrays);
+        //STEP 3
+        messageArrays[0] = messageArrays[0].xor(keyArray[1]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[2]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[3]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[0]);
+        //STEP 4
+        mmbFunc(messageArrays);
+        //STEP 5
+        messageArrays[0] = messageArrays[0].xor(keyArray[2]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[3]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[0]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[1]);
+        //STEP 6
+        mmbFunc(messageArrays);
+        //STEP 7
+        messageArrays[0] = messageArrays[0].xor(keyArray[0]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[1]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[2]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[3]);
+        //STEP 8
+        mmbFunc(messageArrays);
+        //STEP 9
+        messageArrays[0] = messageArrays[0].xor(keyArray[1]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[2]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[3]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[0]);
+        //STEP 10
+        mmbFunc(messageArrays);
+        //STEP 11
+        messageArrays[0] = messageArrays[0].xor(keyArray[2]);
+        messageArrays[1] = messageArrays[1].xor(keyArray[3]);
+        messageArrays[2] = messageArrays[2].xor(keyArray[0]);
+        messageArrays[3] = messageArrays[3].xor(keyArray[1]);
+        //STEP 12
+        mmbFunc(messageArrays);
 
+        //display results
+        printArrays(messageArrays);
 
     }
     public static byte[] flipBytes(byte[] bytes){
@@ -127,12 +159,12 @@ public class mmb {
         return newArray;
     }
     public static void printArrays(BigInteger[] messageArrays){
-        System.out.println("------------");
-        System.out.println(messageArrays[0].toString(16));
-        System.out.println(messageArrays[1].toString(16));
-        System.out.println(messageArrays[2].toString(16));
-        System.out.println(messageArrays[3].toString(16));
-        System.out.println("------------");
+
+        System.out.print(messageArrays[0].toString(16) + "    ");
+        System.out.print(messageArrays[1].toString(16) + "    ");
+        System.out.print(messageArrays[2].toString(16) + "    ");
+        System.out.print(messageArrays[3].toString(16));
+
     }
 
     public static BigInteger[] string2BigInts(String s){
@@ -147,12 +179,6 @@ public class mmb {
         return messageArrays;
     }
 
-    public static int xOr(int a, int b){
-        return a^b;
-    }
-    public static int multMod(int a, int b, int m){
-        return (a*b)%m;
-    }
     public static BigInteger[] mmbFunc(BigInteger[] message){
         //step 1
         for(int i = 0; i < 4; i++){
